@@ -19,7 +19,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     protected Object doCreateBean(String beanName, BeanDefinition beanDefinition) throws BeansException {
         Class<?> beanClass = beanDefinition.getBeanClass();
-        Object bean = null;
+        Object bean;
         // 通過反射創建bean實例
         try {
             // 獲取無參構造函數
