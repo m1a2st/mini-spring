@@ -2,7 +2,6 @@ package org.m1a2st.beans.factory.support;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
-import org.m1a2st.BeansException;
 import org.m1a2st.beans.factory.config.BeanDefinition;
 
 /**
@@ -13,7 +12,7 @@ import org.m1a2st.beans.factory.config.BeanDefinition;
 public class CglibSubclassingInstantiationStrategy implements InstantiationStrategy {
 
     @Override
-    public Object instantiate(BeanDefinition beanDefinition) throws BeansException {
+    public Object instantiate(BeanDefinition beanDefinition) {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(beanDefinition.getBeanClass());
         enhancer.setCallback((MethodInterceptor) (obj, method, args, proxy) -> proxy.invokeSuper(obj, args));

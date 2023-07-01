@@ -5,7 +5,7 @@ import org.m1a2st.BeansException;
 import org.m1a2st.beans.factory.config.BeanDefinition;
 import org.m1a2st.beans.factory.support.CglibSubclassingInstantiationStrategy;
 import org.m1a2st.beans.factory.support.DefaultListableBeanFactory;
-import org.m1a2st.beans.factory.support.SimpleInstantiationStrategy;
+import org.m1a2st.beans.service.HelloService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,7 +19,7 @@ public class BeanFactoryTest {
 
     @Test
     public void testBeanFactory_withSimpleInstantiationStrategy() throws BeansException {
-        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory(new SimpleInstantiationStrategy());
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
         BeanDefinition beanDefinition = new BeanDefinition(HelloService.class);
         beanFactory.registerBeanDefinition("helloService", beanDefinition);
         HelloService helloService = (HelloService) beanFactory.getBean("helloService");
@@ -37,9 +37,4 @@ public class BeanFactoryTest {
         assertEquals(helloService.sayHello(), "Hello");
     }
 
-    static class HelloService {
-        public String sayHello() {
-            return "Hello";
-        }
-    }
 }

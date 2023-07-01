@@ -19,6 +19,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
         super(instantiationStrategy);
     }
 
+    public DefaultListableBeanFactory() {
+    }
+
     @Override
     protected BeanDefinition getBeanDefinition(String beanName) throws BeansException {
         BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);
