@@ -1,7 +1,6 @@
 package org.m1a2st.beans;
 
 import org.junit.jupiter.api.Test;
-import org.m1a2st.BeansException;
 import org.m1a2st.beans.bean.Car;
 import org.m1a2st.beans.bean.Person;
 import org.m1a2st.beans.factory.config.BeanDefinition;

@@ -1,6 +1,6 @@
 package org.m1a2st.beans.factory.support;
 
-import org.m1a2st.BeansException;
+import org.m1a2st.beans.BeansException;
 import org.m1a2st.beans.factory.config.BeanDefinition;
 
 import java.lang.reflect.Constructor;

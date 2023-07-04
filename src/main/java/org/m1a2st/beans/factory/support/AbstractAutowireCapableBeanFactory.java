@@ -1,8 +1,9 @@
 package org.m1a2st.beans.factory.support;
 
 import cn.hutool.core.bean.BeanUtil;
-import org.m1a2st.BeansException;
+import org.m1a2st.beans.BeansException;
 import org.m1a2st.beans.PropertyValue;
+import org.m1a2st.beans.factory.config.AutowireCapableBeanFactory;
 import org.m1a2st.beans.factory.config.BeanDefinition;
 import org.m1a2st.beans.factory.config.BeanReference;
 
@@ -11,7 +12,8 @@ import org.m1a2st.beans.factory.config.BeanReference;
  * @Date 2023/6/30
  * @Version v1.0
  */
-public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory {
+public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory
+        implements AutowireCapableBeanFactory {
 
     private InstantiationStrategy instantiationStrategy = new SimpleInstantiationStrategy();
 

@@ -1,4 +1,4 @@
-package org.m1a2st;
+package org.m1a2st.beans;
 
 /**
  * @Author m1a2st
