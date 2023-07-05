@@ -67,4 +67,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
         }
         return beanDefinition;
     }
+
+    @Override
+    public void preInstantiateSingletons() throws BeansException {
+        for (String beanName : beanDefinitionMap.keySet()) {
+            getBean(beanName);
+        }
+    }
 }

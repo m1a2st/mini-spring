@@ -1,5 +1,6 @@
 package org.m1a2st.beans.factory.support;
 
+import org.m1a2st.beans.BeansException;
 import org.m1a2st.beans.factory.config.BeanDefinition;
 
 /**
@@ -18,6 +19,15 @@ public interface BeanDefinitionRegistry {
      * @param beanDefinition bean定義
      */
     void registerBeanDefinition(String beanName, BeanDefinition beanDefinition);
+
+    /**
+     * 根據名稱查找BeanDefinition
+     *
+     * @param beanName
+     * @return
+     * @throws BeansException 如果找不到BeanDefinition
+     */
+    BeanDefinition getBeanDefinition(String beanName) throws BeansException;
 
     /**
      * 是否包含指定名稱的BeanDefinition

@@ -8,4 +8,11 @@ import org.m1a2st.beans.factory.HierarchicalBeanFactory;
  * @Version v1.0
  */
 public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, SingletonBeanRegistry {
+
+    /**
+     * 添加BeanPostProcessor
+     *
+     * @param beanPostProcessor beanPostProcessor
+     */
+    void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
 }

@@ -3,6 +3,7 @@ package org.m1a2st.beans.factory;
 import org.m1a2st.beans.BeansException;
 import org.m1a2st.beans.factory.config.AutowireCapableBeanFactory;
 import org.m1a2st.beans.factory.config.BeanDefinition;
+import org.m1a2st.beans.factory.config.BeanPostProcessor;
 import org.m1a2st.beans.factory.config.ConfigurableBeanFactory;
 
 /**
@@ -20,4 +21,13 @@ public interface ConfigurableListableBeanFactory extends ListableBeanFactory, Au
      * @throws BeansException 如果找不到BeanDefinition
      */
     BeanDefinition getBeanDefinition(String beanName) throws BeansException;
+
+    /**
+     * 提前實例化所有單例實例
+     *
+     * @throws BeansException Beans異常
+     */
+    void preInstantiateSingletons() throws BeansException;
+
+    void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
 }

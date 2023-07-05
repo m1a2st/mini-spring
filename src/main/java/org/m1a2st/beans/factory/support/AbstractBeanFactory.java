@@ -2,7 +2,11 @@ package org.m1a2st.beans.factory.support;
 
 import org.m1a2st.beans.BeansException;
 import org.m1a2st.beans.factory.config.BeanDefinition;
+import org.m1a2st.beans.factory.config.BeanPostProcessor;
 import org.m1a2st.beans.factory.config.ConfigurableBeanFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Author m1a2st
@@ -10,6 +14,8 @@ import org.m1a2st.beans.factory.config.ConfigurableBeanFactory;
  * @Version v1.0
  */
 public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements ConfigurableBeanFactory {
+
+    private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
 
     @Override
     public Object getBean(String beanName) throws BeansException {
@@ -29,4 +35,15 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
     protected abstract Object createBean(String beanName, BeanDefinition beanDefinition) throws BeansException;
 
     protected abstract BeanDefinition getBeanDefinition(String beanName) throws BeansException;
+
+    @Override
+    public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        // 有則覆蓋
+        this.beanPostProcessors.remove(beanPostProcessor);
+        this.beanPostProcessors.add(beanPostProcessor);
+    }
+
+    public List<BeanPostProcessor> getBeanPostProcessors() {
+        return this.beanPostProcessors;
+    }
 }
