@@ -15,6 +15,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 
     @Override
     public Resource getResource(String location) {
+        // 嘗試Classpath下的資源處理
         if (location.startsWith(CLASSPATH_URL_PREFIX)) {
             return new ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()));
         } else {
