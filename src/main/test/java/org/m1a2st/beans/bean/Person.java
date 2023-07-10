@@ -1,11 +1,15 @@
 package org.m1a2st.beans.bean;
 
+import org.m1a2st.beans.BeansException;
+import org.m1a2st.beans.factory.DisposableBean;
+import org.m1a2st.beans.factory.InitializingBean;
+
 /**
  * @Author m1a2st
  * @Date 2023/7/1
  * @Version v1.0
  */
-public class Person {
+public class Person implements InitializingBean, DisposableBean {
 
     private String name;
     private int age;
@@ -36,5 +40,23 @@ public class Person {
 
     public void setCar(Car car) {
         this.car = car;
+    }
+
+    public void customInitMethod() {
+        System.out.println("I was born in the method named customInitMethod");
+    }
+
+    public void customDestroyMethod() {
+        System.out.println("I died in the method named customDestroyMethod");
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        System.out.println("DisposableBean#destroy");
+    }
+
+    @Override
+    public void afterPropertiesSet() throws BeansException {
+        System.out.println("InitializingBean#afterPropertiesSet");
     }
 }

@@ -9,15 +9,24 @@ import org.m1a2st.beans.BeansException;
  */
 public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContext {
 
-    private String[] configLocations;
+    private final String[] configLocations;
 
-    public ClassPathXmlApplicationContext() {
-    }
-
+    /**
+     * 從xml文件加載BeanDefinition，並且自動刷新上下文
+     *
+     * @param configLocation xml配置文件
+     * @throws BeansException 應用上下文創建失敗
+     */
     public ClassPathXmlApplicationContext(String configLocation) throws BeansException {
         this(new String[]{configLocation});
     }
 
+    /**
+     * 從xml文件加載BeanDefinition，並且自動刷新上下文
+     *
+     * @param configLocations xml配置文件
+     * @throws BeansException 應用上下文創建失敗
+     */
     public ClassPathXmlApplicationContext(String[] configLocations) throws BeansException {
         this.configLocations = configLocations;
         refresh();
