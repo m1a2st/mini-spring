@@ -1,6 +1,5 @@
 package org.m1a2st.beans.service;
 
-import org.m1a2st.beans.BeansException;
 import org.m1a2st.beans.factory.BeanFactory;
 import org.m1a2st.beans.factory.BeanFactoryAware;
 import org.m1a2st.context.ApplicationContext;
@@ -25,7 +24,7 @@ public class HelloService implements BeanFactoryAware, ApplicationContextAware {
     }
 
     @Override
-    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+    public void setBeanFactory(BeanFactory beanFactory) {
         this.beanFactory = beanFactory;
     }
 
@@ -34,7 +33,7 @@ public class HelloService implements BeanFactoryAware, ApplicationContextAware {
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 }
