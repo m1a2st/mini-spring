@@ -1,6 +1,7 @@
 package org.m1a2st.beans.factory.config;
 
 import cn.hutool.core.bean.BeanException;
+import org.m1a2st.beans.BeansException;
 
 /**
  * 用於修改實例化後的bean修改擴展點
@@ -18,7 +19,7 @@ public interface BeanPostProcessor {
      * @return 修改後的bean實例
      * @throws BeanException Bean 處理異常
      */
-    Object postProcessBeforeInitialization(Object bean, String beanName) throws BeanException;
+    Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;
 
     /**
      * 在bean實例化之後，提供修改bean屬性值的機制
@@ -28,5 +29,5 @@ public interface BeanPostProcessor {
      * @return 修改後的bean實例
      * @throws BeanException Bean 處理異常
      */
-    Object postProcessAfterInitialization(Object bean, String beanName) throws BeanException;
+    Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;
 }

@@ -13,7 +13,7 @@ public class CustomerBeanPostProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeanException {
-        System.out.println("CustomerBeanPostProcessor#postProcessBeforeInitialization");
+        System.out.println("CustomerBeanPostProcessor#postProcessBeforeInitialization, beanName: " + beanName);
         // 換品牌
         if ("car".equals(beanName)) {
             ((Car) bean).setBrand("lamborghini");
@@ -23,7 +23,7 @@ public class CustomerBeanPostProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeanException {
-        System.out.println("CustomerBeanPostProcessor#postProcessAfterInitialization");
+        System.out.println("CustomerBeanPostProcessor#postProcessAfterInitialization, beanName: " + beanName);
         return bean;
     }
 }
