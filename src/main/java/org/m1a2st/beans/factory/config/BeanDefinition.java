@@ -6,6 +6,7 @@ import org.m1a2st.beans.PropertyValues;
  * BeanDefinition實例保存bean的信息，包括class類型、
  * 方法構造參數、是否為單例等，
  * 此處簡化只包含class類型跟bean屬性，初始方法名及銷毀方法名
+ * 加上Scope
  *
  * @Author m1a2st
  * @Date 2023/6/30
@@ -15,12 +16,25 @@ public class BeanDefinition {
 
     private Class<?> beanClass;
     private PropertyValues propertyValues;
+
     private String initMethodName;
     private String destroyMethodName;
+
+    private final String SCOPE_SINGLETON = "singleton";
+    private final String SCOPE_PROTOTYPE = "prototype";
+    private String scope = SCOPE_SINGLETON;
+    private boolean singleton = true;
+    private boolean prototype = false;
 
     public BeanDefinition(Class<?> beanClass, PropertyValues propertyValues) {
         this.beanClass = beanClass;
         this.propertyValues = propertyValues != null ? propertyValues : new PropertyValues();
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+        this.singleton = SCOPE_SINGLETON.equals(scope);
+        this.prototype = SCOPE_PROTOTYPE.equals(scope);
     }
 
     public BeanDefinition(Class<?> beanClass) {
@@ -57,5 +71,13 @@ public class BeanDefinition {
 
     public void setDestroyMethodName(String destroyMethodName) {
         this.destroyMethodName = destroyMethodName;
+    }
+
+    public boolean isSingleton() {
+        return singleton;
+    }
+
+    public boolean isPrototype() {
+        return prototype;
     }
 }
