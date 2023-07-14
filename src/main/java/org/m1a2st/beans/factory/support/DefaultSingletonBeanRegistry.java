@@ -1,5 +1,6 @@
 package org.m1a2st.beans.factory.support;
 
+import org.m1a2st.beans.BeansException;
 import org.m1a2st.beans.factory.DisposableBean;
 import org.m1a2st.beans.factory.config.SingletonBeanRegistry;
 
@@ -27,7 +28,8 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
         return singletonObjects.get(beanName);
     }
 
-    protected void addSingleton(String beanName, Object singletonObject) {
+    @Override
+    public void addSingleton(String beanName, Object singletonObject) {
         singletonObjects.put(beanName, singletonObject);
     }
 
@@ -42,7 +44,7 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
             try {
                 disposableBean.destroy();
             } catch (Exception e) {
-//                throw new BeansException("Destroy method on bean with name '" + beanName + "' threw an exception", e);
+                throw new BeansException("Destroy method on bean with name '" + beanName + "' threw an exception", e);
             }
         }
     }

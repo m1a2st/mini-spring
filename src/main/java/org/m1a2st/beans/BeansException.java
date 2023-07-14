@@ -5,7 +5,7 @@ package org.m1a2st.beans;
  * @Date 2023/6/30
  * @Version v1.0
  */
-public class BeansException extends Exception {
+public class BeansException extends RuntimeException {
 
     public BeansException(String msg) {
         super(msg);

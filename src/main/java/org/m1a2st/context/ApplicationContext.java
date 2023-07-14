@@ -9,5 +9,5 @@ import org.m1a2st.core.io.ResourceLoader;
  * @Date 2023/7/6
  * @Version v1.0
  */
-public interface ApplicationContext extends ListableBeanFactory, HierarchicalBeanFactory, ResourceLoader {
+public interface ApplicationContext extends ListableBeanFactory, HierarchicalBeanFactory, ResourceLoader, ApplicationEventPublisher {
 }
