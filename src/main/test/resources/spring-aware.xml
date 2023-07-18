@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	         http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="person" class="org.m1a2st.beans.bean.Person">
+        <property name="name" value="m1a2st"/>
+        <property name="car" ref="car"/>
+    </bean>
+
+    <bean id="car" class="org.m1a2st.beans.bean.Car">
+        <property name="brand" value="tesla"/>
+    </bean>
+    <bean id="helloService" class="org.m1a2st.beans.service.HelloService"/>
+    <bean class="org.m1a2st.beans.common.CustomerBeanPostProcessor"/>
+    <bean class="org.m1a2st.beans.common.CustomerFactoryPostProcessor"/>
+</beans>

@@ -8,10 +8,7 @@ import org.m1a2st.beans.PropertyValue;
 import org.m1a2st.beans.factory.BeanFactoryAware;
 import org.m1a2st.beans.factory.DisposableBean;
 import org.m1a2st.beans.factory.InitializingBean;
-import org.m1a2st.beans.factory.config.AutowireCapableBeanFactory;
-import org.m1a2st.beans.factory.config.BeanDefinition;
-import org.m1a2st.beans.factory.config.BeanPostProcessor;
-import org.m1a2st.beans.factory.config.BeanReference;
+import org.m1a2st.beans.factory.config.*;
 
 import java.lang.reflect.Method;
 
@@ -34,7 +31,39 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     @Override
     protected Object createBean(String beanName, BeanDefinition beanDefinition) throws BeansException {
+        // 如果bean需要代理，則直接返回代理對象
+        Object bean = resolveBeforeInstantiation(beanName, beanDefinition);
+        if (bean != null) {
+            return bean;
+        }
         return doCreateBean(beanName, beanDefinition);
+    }
+
+    /**
+     * 執行InstantiationAwareBeanPostProcessor 的方法，如果bean 需要代理，直接返回代理對象
+     *
+     * @param beanName       bean的名稱
+     * @param beanDefinition bean的定義（屬性...）
+     * @return bean的實例
+     */
+    protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
+        Object bean = applyBeanPostProcessorsBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
+        if (bean != null) {
+            bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+        }
+        return bean;
+    }
+
+    protected Object applyBeanPostProcessorsBeforeInstantiation(Class<?> beanClass, String beanName) {
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                Object result = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessBeforeInstantiation(beanClass, beanName);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
     }
 
     protected Object doCreateBean(String beanName, BeanDefinition beanDefinition) throws BeansException {
@@ -158,5 +187,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     private Object createBeanInstance(BeanDefinition beanDefinition) throws BeansException {
         return instantiationStrategy.instantiate(beanDefinition);
+    }
+
+    public InstantiationStrategy getInstantiationStrategy() {
+        return instantiationStrategy;
     }
 }
