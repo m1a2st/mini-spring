@@ -2,6 +2,8 @@ package org.m1a2st.beans.factory.config;
 
 import org.m1a2st.beans.PropertyValues;
 
+import java.util.Objects;
+
 /**
  * BeanDefinition實例保存bean的信息，包括class類型、
  * 方法構造參數、是否為單例等，
@@ -79,5 +81,18 @@ public class BeanDefinition {
 
     public boolean isPrototype() {
         return prototype;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BeanDefinition that = (BeanDefinition) o;
+        return beanClass.equals(that.beanClass);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(beanClass);
     }
 }
