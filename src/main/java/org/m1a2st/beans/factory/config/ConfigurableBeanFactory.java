@@ -1,6 +1,7 @@
 package org.m1a2st.beans.factory.config;
 
 import org.m1a2st.beans.factory.HierarchicalBeanFactory;
+import org.m1a2st.context.util.StringValueResolver;
 
 /**
  * @Author m1a2st
@@ -20,4 +21,8 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
      * 銷毀單例bean
      */
     void destroySingletons();
+
+    void addEmbeddedValueResolver(StringValueResolver valueResolver);
+
+    String resolveEmbeddedValue(String value);
 }

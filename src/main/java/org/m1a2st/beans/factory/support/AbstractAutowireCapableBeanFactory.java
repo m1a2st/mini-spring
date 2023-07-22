@@ -5,6 +5,7 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
 import org.m1a2st.beans.BeansException;
 import org.m1a2st.beans.PropertyValue;
+import org.m1a2st.beans.PropertyValues;
 import org.m1a2st.beans.factory.BeanFactoryAware;
 import org.m1a2st.beans.factory.DisposableBean;
 import org.m1a2st.beans.factory.InitializingBean;
@@ -71,6 +72,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         try {
             // 創造Bean 實體
             bean = createBeanInstance(beanDefinition);
+            // 在設置bean 屬性之前，允許BeanPostProcessor 修改Bean 的屬性值
+            applyBeanPostProcessorsBeforeApplyingPropertyValues(beanName, bean, beanDefinition);
             // 為Bean 填充屬性
             addPropertyValue(beanName, bean, beanDefinition);
             // 執行Bean 的初始化方法和BeanPostProcessor 的前置和後置處理方法
@@ -84,6 +87,27 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             addSingleton(beanName, bean);
         }
         return bean;
+    }
+
+    /**
+     * 在設置bean 屬性之前，允許BeanPostProcessor 修改Bean 的屬性值
+     *
+     * @param beanName
+     * @param bean
+     * @param beanDefinition
+     */
+    private void applyBeanPostProcessorsBeforeApplyingPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                PropertyValues pvs = ((InstantiationAwareBeanPostProcessor) beanPostProcessor)
+                        .postProcessPropertyValues(beanDefinition.getPropertyValues(), bean, beanName);
+                if (pvs != null) {
+                    for (PropertyValue propertyValue : pvs.getPropertyValues()) {
+                        beanDefinition.getPropertyValues().addPropertyValue(propertyValue);
+                    }
+                }
+            }
+        }
     }
 
     protected void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {

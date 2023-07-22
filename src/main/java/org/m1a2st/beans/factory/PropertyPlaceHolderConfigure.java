@@ -5,6 +5,7 @@ import org.m1a2st.beans.PropertyValue;
 import org.m1a2st.beans.PropertyValues;
 import org.m1a2st.beans.factory.config.BeanDefinition;
 import org.m1a2st.beans.factory.config.BeanFactoryPostProcessor;
+import org.m1a2st.context.util.StringValueResolver;
 import org.m1a2st.core.io.DefaultResourceLoader;
 import org.m1a2st.core.io.Resource;
 
@@ -24,9 +25,13 @@ public class PropertyPlaceHolderConfigure implements BeanFactoryPostProcessor {
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        // 加載屬性配置文件
         Properties properties = loadProperties();
-
+        // 屬性值替換佔位符
         processProperties(beanFactory, properties);
+        // 往容器添加StringValueResolver，用於解析@Value注解
+        StringValueResolver valueResolver = new PlaceholderResolvingStringValueResolver(properties);
+        beanFactory.addEmbeddedValueResolver(valueResolver);
     }
 
     /**
@@ -59,21 +64,41 @@ public class PropertyPlaceHolderConfigure implements BeanFactoryPostProcessor {
         for (PropertyValue propertyValue : propertyValues.getPropertyValues()) {
             Object value = propertyValue.getValue();
             if (value instanceof String) {
-                String strVal = (String) value;
-                StringBuffer sb = new StringBuffer(strVal);
-                int startIndex = strVal.indexOf(PLACEHOLDER_PREFIX);
-                int endIndex = strVal.indexOf(PLACEHOLDER_SUFFIX);
-                if (startIndex != -1 && endIndex != -1 && startIndex < endIndex) {
-                    String propKey = strVal.substring(startIndex + PLACEHOLDER_PREFIX.length(), endIndex);
-                    String propVal = properties.getProperty(propKey);
-                    sb.replace(startIndex, endIndex + PLACEHOLDER_SUFFIX.length(), propVal);
-                    propertyValues.addPropertyValue(new PropertyValue(propertyValue.getName(), sb.toString()));
-                }
+                value = resolvePlaceholder((String) value, properties);
+                propertyValues.addPropertyValue(new PropertyValue(propertyValue.getName(), value));
             }
         }
     }
 
+    private String resolvePlaceholder(String value, Properties properties) {
+        // 僅支持一個佔位符的格式
+        StringBuilder buf = new StringBuilder(value);
+        int startIndex = value.indexOf(PLACEHOLDER_PREFIX);
+        int endIndex = value.indexOf(PLACEHOLDER_SUFFIX);
+        if (startIndex != -1 && endIndex != -1 && startIndex < endIndex) {
+            String propKey = value.substring(startIndex + 2, endIndex);
+            String propVal = properties.getProperty(propKey);
+            buf.replace(startIndex, endIndex + 1, propVal);
+        }
+        return buf.toString();
+    }
+
     public void setLocation(String location) {
         this.location = location;
+    }
+
+
+    private class PlaceholderResolvingStringValueResolver implements StringValueResolver {
+
+        private final Properties properties;
+
+        public PlaceholderResolvingStringValueResolver(Properties properties) {
+            this.properties = properties;
+        }
+
+        @Override
+        public String resolveStringValue(String strVal) throws BeansException {
+            return PropertyPlaceHolderConfigure.this.resolvePlaceholder(strVal, properties);
+        }
     }
 }

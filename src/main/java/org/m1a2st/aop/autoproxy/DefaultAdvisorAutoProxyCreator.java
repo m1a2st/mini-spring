@@ -6,6 +6,7 @@ import org.m1a2st.aop.*;
 import org.m1a2st.aop.aspectj.AspectJExpressionPointcutAdvisor;
 import org.m1a2st.aop.framework.ProxyFactory;
 import org.m1a2st.beans.BeansException;
+import org.m1a2st.beans.PropertyValues;
 import org.m1a2st.beans.factory.BeanFactory;
 import org.m1a2st.beans.factory.BeanFactoryAware;
 import org.m1a2st.beans.factory.config.BeanDefinition;
@@ -69,6 +70,11 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
             throw new BeansException("Error create proxy bean for: " + beanName, ex);
         }
         return null;
+    }
+
+    @Override
+    public PropertyValues postProcessPropertyValues(PropertyValues pvs, Object bean, String beanName) throws BeansException {
+        return pvs;
     }
 
     private boolean isInfrastructureClass(Class<?> beanClass) {

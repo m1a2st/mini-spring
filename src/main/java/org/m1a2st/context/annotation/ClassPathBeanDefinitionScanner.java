@@ -1,6 +1,7 @@
 package org.m1a2st.context.annotation;
 
 import cn.hutool.core.util.StrUtil;
+import org.m1a2st.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.m1a2st.beans.factory.config.BeanDefinition;
 import org.m1a2st.beans.factory.support.BeanDefinitionRegistry;
 import org.m1a2st.stereotype.Component;
@@ -14,6 +15,7 @@ import java.util.Set;
  */
 public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateComponentProvider {
 
+    public static final String AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME = "org.m1a2st.context.annotation.internalAutowiredAnnotationProcessor";
     private final BeanDefinitionRegistry registry;
 
     public ClassPathBeanDefinitionScanner(BeanDefinitionRegistry registry) {
@@ -36,6 +38,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
                 registry.registerBeanDefinition(beanName, candidate);
             }
         }
+        registry.registerBeanDefinition(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME, new BeanDefinition(AutowiredAnnotationBeanPostProcessor.class));
     }
 
     private String resolveScope(BeanDefinition beanDefinition) {
