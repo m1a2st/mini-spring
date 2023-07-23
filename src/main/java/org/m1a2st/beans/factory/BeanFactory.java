@@ -30,4 +30,6 @@ public interface BeanFactory {
      * @throws BeansException 當bean不存在時
      */
     <T> T getBean(String beanName, Class<T> requiredType) throws BeansException;
+
+    <T> T getBean(Class<T> requiredType) throws BeansException;
 }

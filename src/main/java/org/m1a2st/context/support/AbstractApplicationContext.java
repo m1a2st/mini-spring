@@ -154,4 +154,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
     public void registryShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(this::doClose));
     }
+
+    @Override
+    public <T> T getBean(Class<T> requiredType) throws BeansException {
+        return getBeanFactory().getBean(requiredType);
+    }
 }

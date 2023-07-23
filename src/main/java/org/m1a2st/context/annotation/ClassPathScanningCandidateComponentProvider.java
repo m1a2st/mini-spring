@@ -18,9 +18,7 @@ public class ClassPathScanningCandidateComponentProvider {
         LinkedHashSet<BeanDefinition> candidates = new LinkedHashSet<>();
         // 掃描有org.m1a2st.stereotype.Component註解的類
         ClassUtil.scanPackageByAnnotation(basePackage, Component.class)
-                .forEach(clazz -> {
-                    candidates.add(new BeanDefinition(clazz));
-                });
+                .forEach(clazz -> candidates.add(new BeanDefinition(clazz)));
         return candidates;
     }
 }
