@@ -72,6 +72,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         try {
             // 創造Bean 實體
             bean = createBeanInstance(beanDefinition);
+            // bean 實例化後進行
+            if (!applyBeanPostProcessorsAfterInstantiation(beanName, bean)) {
+                return bean;
+            }
             // 在設置bean 屬性之前，允許BeanPostProcessor 修改Bean 的屬性值
             applyBeanPostProcessorsBeforeApplyingPropertyValues(beanName, bean, beanDefinition);
             // 為Bean 填充屬性
@@ -90,11 +94,31 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     /**
+     * bean 實例化後執行，如果返回false，則不執行後續的BeanPostProcessor
+     *
+     * @param beanName bean的名稱
+     * @param bean     bean的實例
+     * @return 返回一個boolean值，如果為false，則不執行後續的BeanPostProcessor
+     */
+    private boolean applyBeanPostProcessorsAfterInstantiation(String beanName, Object bean) {
+        boolean continueWithInstantiation = true;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                if (!((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessAfterInstantiation(bean, beanName)) {
+                    continueWithInstantiation = false;
+                    break;
+                }
+            }
+        }
+        return continueWithInstantiation;
+    }
+
+    /**
      * 在設置bean 屬性之前，允許BeanPostProcessor 修改Bean 的屬性值
      *
-     * @param beanName
-     * @param bean
-     * @param beanDefinition
+     * @param beanName       bean名稱
+     * @param bean           bean實例
+     * @param beanDefinition bean定義
      */
     private void applyBeanPostProcessorsBeforeApplyingPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition) {
         for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {

@@ -8,4 +8,6 @@ package org.m1a2st.beans.service;
 public interface WorldService {
 
     void explode();
+
+    String getName();
 }

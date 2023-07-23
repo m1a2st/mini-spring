@@ -9,7 +9,6 @@ import org.m1a2st.beans.BeansException;
 import org.m1a2st.beans.PropertyValues;
 import org.m1a2st.beans.factory.BeanFactory;
 import org.m1a2st.beans.factory.BeanFactoryAware;
-import org.m1a2st.beans.factory.config.BeanDefinition;
 import org.m1a2st.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import org.m1a2st.beans.factory.support.DefaultListableBeanFactory;
 
@@ -35,40 +34,39 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
     }
 
     @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
+    public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
+        return true;
     }
 
     @Override
-    public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         // 避免死循環
-        if (isInfrastructureClass(beanClass)) {
+        if (isInfrastructureClass(bean.getClass())) {
             return null;
         }
         Collection<AspectJExpressionPointcutAdvisor> advisors = beanFactory.getBeansOfType(AspectJExpressionPointcutAdvisor.class).values();
         try {
             for (AspectJExpressionPointcutAdvisor advisor : advisors) {
                 ClassFilter classFilter = advisor.getPointcut().getClassFilter();
-                if (classFilter.matches(beanClass)) {
+                if (classFilter.matches(bean.getClass())) {
                     // create proxy object
                     AdvisedSupport advisedSupport = new AdvisedSupport();
 
-                    // new bean instance
-                    BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
-                    Object bean = beanFactory.getInstantiationStrategy().instantiate(beanDefinition);
-
                     // set target source
-                    TargetSource targetSource = new TargetSource(bean);
-                    advisedSupport.setTargetSource(targetSource);
+                    advisedSupport.setTargetSource(new TargetSource(bean));
                     advisedSupport.setMethodInterceptor((MethodInterceptor) advisor.getAdvice());
-                    MethodMatcher methodMatcher = advisor.getPointcut().getMethodMatcher();
-                    advisedSupport.setMethodMatcher(methodMatcher);
+                    advisedSupport.setMethodMatcher(advisor.getPointcut().getMethodMatcher());
                     return new ProxyFactory(advisedSupport).getProxy();
                 }
             }
         } catch (Exception ex) {
             throw new BeansException("Error create proxy bean for: " + beanName, ex);
         }
+        return null;
+    }
+
+    @Override
+    public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
         return null;
     }
 

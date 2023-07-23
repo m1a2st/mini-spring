@@ -21,6 +21,16 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
     Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException;
 
     /**
+     * 在bean實例化之後執行，設置屬性之前執行
+     *
+     * @param bean     bean實例
+     * @param beanName bean的名稱
+     * @return 返回一個boolean值，如果為false，則不會執行後續的bean處理器
+     * @throws BeansException bean處理異常
+     */
+    boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException;
+
+    /**
      * 在bean實例化之後執行，設置屬性之前
      *
      * @param pvs      屬性列表
