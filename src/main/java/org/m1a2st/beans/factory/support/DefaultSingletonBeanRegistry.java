@@ -22,10 +22,15 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
 
     private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>();
     private final Map<String, DisposableBean> disposableBeans = new ConcurrentHashMap<>();
+    protected final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>();
 
     @Override
     public Object getSingleton(String beanName) {
-        return singletonObjects.get(beanName);
+        Object bean = singletonObjects.get(beanName);
+        if (bean == null) {
+            bean = earlySingletonObjects.get(beanName);
+        }
+        return bean;
     }
 
     @Override

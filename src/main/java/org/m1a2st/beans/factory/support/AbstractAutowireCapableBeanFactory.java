@@ -74,6 +74,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         try {
             // 創造Bean 實體
             bean = createBeanInstance(beanDefinition);
+            // 為解決循環依賴，將實例化的Bean放入緩存提前暴露
+            earlySingletonObjects.put(beanName, bean);
             // bean 實例化後進行
             if (!applyBeanPostProcessorsAfterInstantiation(beanName, bean)) {
                 return bean;
