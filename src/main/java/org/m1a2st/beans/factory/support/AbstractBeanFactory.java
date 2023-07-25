@@ -6,6 +6,7 @@ import org.m1a2st.beans.factory.config.BeanDefinition;
 import org.m1a2st.beans.factory.config.BeanPostProcessor;
 import org.m1a2st.beans.factory.config.ConfigurableBeanFactory;
 import org.m1a2st.context.util.StringValueResolver;
+import org.m1a2st.core.convert.ConversionService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
     private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
     private final Map<String, Object> factoryBeanObjectCache = new HashMap<>();
     private final List<StringValueResolver> embeddedValueResolvers = new ArrayList<>();
+    private ConversionService conversionService;
 
     @Override
     public Object getBean(String beanName) throws BeansException {
@@ -90,5 +92,22 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
             result = resolver.resolveStringValue(result);
         }
         return result;
+    }
+
+    @Override
+    public boolean containsBean(String beanName) {
+        return containsBeanDefinition(beanName);
+    }
+
+    protected abstract boolean containsBeanDefinition(String beanName);
+
+    @Override
+    public ConversionService getConversionService() {
+        return conversionService;
+    }
+
+    @Override
+    public void setConversionService(ConversionService conversionService) {
+        this.conversionService = conversionService;
     }
 }

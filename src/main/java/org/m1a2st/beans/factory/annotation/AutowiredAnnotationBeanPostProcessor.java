@@ -1,12 +1,14 @@
 package org.m1a2st.beans.factory.annotation;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.TypeUtil;
 import org.m1a2st.beans.BeansException;
 import org.m1a2st.beans.PropertyValues;
 import org.m1a2st.beans.factory.BeanFactory;
 import org.m1a2st.beans.factory.BeanFactoryAware;
 import org.m1a2st.beans.factory.ConfigurableListableBeanFactory;
 import org.m1a2st.beans.factory.config.InstantiationAwareBeanPostProcessor;
+import org.m1a2st.core.convert.ConversionService;
 
 import java.lang.reflect.Field;
 
@@ -34,8 +36,19 @@ public class AutowiredAnnotationBeanPostProcessor implements InstantiationAwareB
         for (Field field : fields) {
             Value valueAnnotation = field.getAnnotation(Value.class);
             if (valueAnnotation != null) {
-                String value = valueAnnotation.value();
-                value = beanFactory.resolveEmbeddedValue(value);
+                Object value = valueAnnotation.value();
+                value = beanFactory.resolveEmbeddedValue((String) value);
+
+                // 類型轉換
+                Class<?> sourceType = value.getClass();
+                Class<?> targetType = (Class<?>) TypeUtil.getType(field);
+                ConversionService conversionService = beanFactory.getConversionService();
+                if (conversionService != null) {
+                    if (conversionService.canConvert(sourceType, targetType)) {
+                        value = conversionService.convert(value, targetType);
+                    }
+                }
+
                 BeanUtil.setFieldValue(bean, field.getName(), value);
             }
         }

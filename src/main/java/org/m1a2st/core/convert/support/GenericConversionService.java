@@ -1,5 +1,6 @@
 package org.m1a2st.core.convert.support;
 
+import cn.hutool.core.convert.BasicType;
 import org.m1a2st.core.convert.ConversionService;
 import org.m1a2st.core.convert.converter.Converter;
 import org.m1a2st.core.convert.converter.ConverterFactory;
@@ -31,6 +32,7 @@ public class GenericConversionService implements ConversionService, ConverterReg
     @Override
     public <T> T convert(Object source, Class<T> targetType) {
         Class<?> sourceType = source.getClass();
+        targetType = (Class<T>) BasicType.wrap(targetType);
         GenericConverter converter = getConverter(sourceType, targetType);
         return (T) converter.convert(source, sourceType, targetType);
     }
@@ -77,6 +79,8 @@ public class GenericConversionService implements ConversionService, ConverterReg
 
     private List<Class<?>> getClassHierarchy(Class<?> clazz) {
         ArrayList<Class<?>> hierarchy = new ArrayList<>();
+        // 基本型別包裝成包裝類
+        clazz = BasicType.wrap(clazz);
         while (clazz != null) {
             hierarchy.add(clazz);
             clazz = clazz.getSuperclass();

@@ -2,6 +2,7 @@ package org.m1a2st.beans.factory.config;
 
 import org.m1a2st.beans.factory.HierarchicalBeanFactory;
 import org.m1a2st.context.util.StringValueResolver;
+import org.m1a2st.core.convert.ConversionService;
 
 /**
  * @Author m1a2st
@@ -25,4 +26,8 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
     void addEmbeddedValueResolver(StringValueResolver valueResolver);
 
     String resolveEmbeddedValue(String value);
+
+    ConversionService getConversionService();
+
+    void setConversionService(ConversionService conversionService);
 }

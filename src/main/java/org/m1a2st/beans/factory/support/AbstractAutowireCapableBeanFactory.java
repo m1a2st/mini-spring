@@ -3,6 +3,7 @@ package org.m1a2st.beans.factory.support;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.TypeUtil;
 import org.m1a2st.beans.BeansException;
 import org.m1a2st.beans.PropertyValue;
 import org.m1a2st.beans.PropertyValues;
@@ -10,6 +11,7 @@ import org.m1a2st.beans.factory.BeanFactoryAware;
 import org.m1a2st.beans.factory.DisposableBean;
 import org.m1a2st.beans.factory.InitializingBean;
 import org.m1a2st.beans.factory.config.*;
+import org.m1a2st.core.convert.ConversionService;
 
 import java.lang.reflect.Method;
 
@@ -149,7 +151,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         // 執行BeanPostProcessor 的前置處理方法
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
 
-        // TODO 執行Bean 的初始化方法
         try {
             invokeInitMethods(beanName, wrappedBean, beanDefinition);
         } catch (Throwable e) {
@@ -222,8 +223,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 String name = propertyValue.getName();
                 Object value = propertyValue.getValue();
                 if (value instanceof BeanReference) {
+                    // beanA依賴 beanB，先創建beanB
                     BeanReference beanReference = (BeanReference) value;
                     value = getBean(beanReference.getBeanName());
+                } else {
+                    // 類型轉換
+                    Class<?> sourceType = value.getClass();
+                    Class<?> targetType = (Class<?>) TypeUtil.getFieldType(bean.getClass(), name);
+                    ConversionService conversionService = getConversionService();
+                    if (conversionService != null) {
+                        if (conversionService.canConvert(sourceType, targetType)) {
+                            value = conversionService.convert(value, targetType);
+                        }
+                    }
                 }
                 // 通過反射設置屬性值
                 BeanUtil.setFieldValue(bean, name, value);
