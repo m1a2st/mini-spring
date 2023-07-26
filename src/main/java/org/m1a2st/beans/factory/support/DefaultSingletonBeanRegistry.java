@@ -2,6 +2,7 @@ package org.m1a2st.beans.factory.support;
 
 import org.m1a2st.beans.BeansException;
 import org.m1a2st.beans.factory.DisposableBean;
+import org.m1a2st.beans.factory.ObjectFactory;
 import org.m1a2st.beans.factory.config.SingletonBeanRegistry;
 
 import java.util.ArrayList;
@@ -20,22 +21,44 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
 
-    private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>();
-    private final Map<String, DisposableBean> disposableBeans = new ConcurrentHashMap<>();
+    // 二級緩存
     protected final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>();
+    // 一級緩存
+    private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>();
+    // 三級緩存
+    private final Map<String, ObjectFactory<?>> singletonFactories = new ConcurrentHashMap<>();
+
+    private final Map<String, DisposableBean> disposableBeans = new ConcurrentHashMap<>();
 
     @Override
     public Object getSingleton(String beanName) {
-        Object bean = singletonObjects.get(beanName);
-        if (bean == null) {
-            bean = earlySingletonObjects.get(beanName);
+        Object singletonObject = singletonObjects.get(beanName);
+        if (singletonObject == null) {
+            singletonObject = earlySingletonObjects.get(beanName);
+            if (singletonObject == null) {
+                ObjectFactory<?> singletonFactory = singletonFactories.get(beanName);
+                if (singletonFactory != null) {
+                    // 這裡的singletonObject是一個ObjectFactory，而不是bean實例
+                    singletonObject = singletonFactory.getObject();
+                    // 從三級緩存放進二級緩存
+                    earlySingletonObjects.put(beanName, singletonObject);
+                    // 從三級緩存移除
+                    singletonFactories.remove(beanName);
+                }
+            }
         }
-        return bean;
+        return singletonObject;
+    }
+
+    protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
+        singletonFactories.put(beanName, singletonFactory);
     }
 
     @Override
     public void addSingleton(String beanName, Object singletonObject) {
         singletonObjects.put(beanName, singletonObject);
+        earlySingletonObjects.remove(beanName);
+        singletonFactories.remove(beanName);
     }
 
     public void registerDisposableBean(String beanName, DisposableBean bean) {

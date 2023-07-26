@@ -75,7 +75,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             // 創造Bean 實體
             bean = createBeanInstance(beanDefinition);
             // 為解決循環依賴，將實例化的Bean放入緩存提前暴露
-            earlySingletonObjects.put(beanName, bean);
+            if (beanDefinition.isSingleton()) {
+                Object finalBean = bean;
+                addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, beanDefinition, finalBean));
+            }
             // bean 實例化後進行
             if (!applyBeanPostProcessorsAfterInstantiation(beanName, bean)) {
                 return bean;
@@ -91,10 +94,27 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         }
         // 註冊有銷毀方法的Bean
         registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
+
+        Object exposeObject = bean;
         if (beanDefinition.isSingleton()) {
-            addSingleton(beanName, bean);
+            // 如果有代理對象，此處獲取代理對象
+            exposeObject = getSingleton(beanName);
+            addSingleton(beanName, exposeObject);
         }
-        return bean;
+        return exposeObject;
+    }
+
+    protected Object getEarlyBeanReference(String beanName, BeanDefinition beanDefinition, Object bean) {
+        Object exposedObject = bean;
+        for (BeanPostProcessor bp : getBeanPostProcessors()) {
+            if (bp instanceof InstantiationAwareBeanPostProcessor) {
+                exposedObject = ((InstantiationAwareBeanPostProcessor) bp).getEarlyBeanReference(exposedObject, beanName);
+                if (exposedObject == null) {
+                    return null;
+                }
+            }
+        }
+        return exposedObject;
     }
 
     /**
