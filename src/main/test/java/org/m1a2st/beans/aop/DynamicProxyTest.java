@@ -5,13 +5,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.m1a2st.aop.AdvisedSupport;
 import org.m1a2st.aop.ClassFilter;
-import org.m1a2st.aop.MethodMatcher;
 import org.m1a2st.aop.TargetSource;
-import org.m1a2st.aop.aspectj.AspectJExpressionPointcut;
 import org.m1a2st.aop.aspectj.AspectJExpressionPointcutAdvisor;
 import org.m1a2st.aop.framework.JdkDynamicAopProxy;
 import org.m1a2st.aop.framework.ProxyFactory;
+import org.m1a2st.aop.framework.adapter.AfterReturningAdviceInterceptor;
 import org.m1a2st.aop.framework.adapter.MethodBeforeAdviceInterceptor;
+import org.m1a2st.beans.common.WorldServiceAfterReturnAdvice;
 import org.m1a2st.beans.common.WorldServiceBeforeAdvice;
 import org.m1a2st.beans.common.WorldServiceInterceptor;
 import org.m1a2st.beans.service.WorldService;
@@ -33,12 +33,16 @@ public class DynamicProxyTest {
         advisedSupport = new AdvisedSupport();
         TargetSource targetSource = new TargetSource(worldService);
         WorldServiceInterceptor interceptor = new WorldServiceInterceptor();
-        MethodMatcher methodMatcher =
-                new AspectJExpressionPointcut("execution(* org.m1a2st.beans.service.WorldService.*(..))")
-                        .getMethodMatcher();
+        String expression = "execution(* org.m1a2st.beans.service.WorldService.*(..))";
+        AspectJExpressionPointcutAdvisor advisor =
+                new AspectJExpressionPointcutAdvisor();
+        advisor.setExpression(expression);
+        AfterReturningAdviceInterceptor methodInterceptor =
+                new AfterReturningAdviceInterceptor(new WorldServiceAfterReturnAdvice());
+        advisor.setAdvice(methodInterceptor);
         advisedSupport.setTargetSource(targetSource);
         advisedSupport.setMethodInterceptor(interceptor);
-        advisedSupport.setMethodMatcher(methodMatcher);
+        advisedSupport.addAdvisor(advisor);
     }
 
     @Test
@@ -51,7 +55,7 @@ public class DynamicProxyTest {
     public void testProxyFactory() {
         // 使用JDK動態代理
         advisedSupport.setProxyTargetClass(false);
-        WorldService proxy = (WorldService) new ProxyFactory(advisedSupport).getProxy();
+        WorldService proxy = (WorldService) new ProxyFactory().getProxy();
         proxy.explode();
         // 使用不同的代理
 //        advisedSupport.setProxyTargetClass(true);

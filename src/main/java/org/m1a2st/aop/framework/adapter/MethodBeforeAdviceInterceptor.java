@@ -3,6 +3,7 @@ package org.m1a2st.aop.framework.adapter;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.m1a2st.aop.BeforeAdvice;
 import org.m1a2st.aop.MethodBeforeAdvice;
 
 /**
@@ -10,7 +11,7 @@ import org.m1a2st.aop.MethodBeforeAdvice;
  * @Date 2023/7/16
  * @Version v1.0
  */
-public class MethodBeforeAdviceInterceptor implements MethodInterceptor {
+public class MethodBeforeAdviceInterceptor implements MethodInterceptor, BeforeAdvice {
 
     private MethodBeforeAdvice advice;
 

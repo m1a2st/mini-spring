@@ -1,11 +1,11 @@
 package org.m1a2st.aop.framework;
 
-import org.aopalliance.intercept.MethodInterceptor;
 import org.m1a2st.aop.AdvisedSupport;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.List;
 
 /**
  * @Author m1a2st
@@ -22,12 +22,21 @@ public class JdkDynamicAopProxy implements AopProxy, InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (advised.getMethodMatcher().matches(method, advised.getTargetSource().getTarget().getClass())) {
-            //代理方法
-            MethodInterceptor methodInterceptor = advised.getMethodInterceptor();
-            return methodInterceptor.invoke(new ReflectiveMethodInvocation(advised.getTargetSource().getTarget(), method, args));
+        // 獲取目標對象
+        Object target = advised.getTargetSource().getTarget();
+        Class<?> targetClazz = target.getClass();
+        Object retVal;
+        // 獲取攔截器鏈
+        List<Object> chain = advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClazz);
+        if (chain == null || chain.isEmpty()) {
+            return method.invoke(target, args);
+        } else {
+            // 將攔截器統一封裝成ReflectiveMethodInvocation
+            ReflectiveMethodInvocation invocation = new ReflectiveMethodInvocation(proxy, target, method, args, targetClazz, chain);
+            // 依次執行每個攔截器的invoke方法
+            retVal = invocation.proceed();
         }
-        return method.invoke(advised.getTargetSource().getTarget(), args);
+        return retVal;
     }
 
     /**

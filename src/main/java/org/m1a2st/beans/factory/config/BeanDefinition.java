@@ -27,6 +27,7 @@ public class BeanDefinition {
     private String scope = SCOPE_SINGLETON;
     private boolean singleton = true;
     private boolean prototype = false;
+    private boolean lazyInit = false;
 
     public BeanDefinition(Class<?> beanClass, PropertyValues propertyValues) {
         this.beanClass = beanClass;
@@ -81,6 +82,14 @@ public class BeanDefinition {
 
     public boolean isPrototype() {
         return prototype;
+    }
+
+    public boolean isLazyInit() {
+        return lazyInit;
+    }
+
+    public void setLazyInit(boolean lazyInit) {
+        this.lazyInit = lazyInit;
     }
 
     @Override

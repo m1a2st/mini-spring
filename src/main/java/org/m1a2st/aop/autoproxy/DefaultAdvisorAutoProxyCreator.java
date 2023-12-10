@@ -1,7 +1,6 @@
 package org.m1a2st.aop.autoproxy;
 
 import org.aopalliance.aop.Advice;
-import org.aopalliance.intercept.MethodInterceptor;
 import org.m1a2st.aop.*;
 import org.m1a2st.aop.aspectj.AspectJExpressionPointcutAdvisor;
 import org.m1a2st.aop.framework.ProxyFactory;
@@ -63,6 +62,7 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
         }
         Collection<AspectJExpressionPointcutAdvisor> advisors = beanFactory.getBeansOfType(AspectJExpressionPointcutAdvisor.class).values();
         try {
+            ProxyFactory proxyFactory = new ProxyFactory();
             for (AspectJExpressionPointcutAdvisor advisor : advisors) {
                 ClassFilter classFilter = advisor.getPointcut().getClassFilter();
                 if (classFilter.matches(bean.getClass())) {
@@ -71,11 +71,12 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
 
                     // set target source
                     advisedSupport.setTargetSource(new TargetSource(bean));
-                    advisedSupport.setMethodInterceptor((MethodInterceptor) advisor.getAdvice());
+                    advisedSupport.addAdvisor(advisor);
                     advisedSupport.setMethodMatcher(advisor.getPointcut().getMethodMatcher());
                     return new ProxyFactory(advisedSupport).getProxy();
                 }
             }
+            if (!proxyFactory.getAdvisors().isEmpty()) return proxyFactory.getProxy();
         } catch (Exception ex) {
             throw new BeansException("Error create proxy bean for: " + beanName, ex);
         }

@@ -7,9 +7,12 @@ import org.m1a2st.aop.AdvisedSupport;
  * @Date 2023/7/16
  * @Version v1.0
  */
-public class ProxyFactory {
+public class ProxyFactory extends AdvisedSupport {
 
-    private final AdvisedSupport advisedSupport;
+    private AdvisedSupport advisedSupport;
+
+    public ProxyFactory() {
+    }
 
     public ProxyFactory(AdvisedSupport advisedSupport) {
         this.advisedSupport = advisedSupport;
@@ -20,7 +23,7 @@ public class ProxyFactory {
     }
 
     private AopProxy createAopProxy() {
-        if (advisedSupport.isProxyTargetClass()) {
+        if (advisedSupport.isProxyTargetClass() || getTargetSource().getTargetClass().length == 0) {
             return new AnotherAopProxy(advisedSupport);
         }
         return new JdkDynamicAopProxy(advisedSupport);

@@ -1,6 +1,13 @@
 package org.m1a2st.aop;
 
 import org.aopalliance.intercept.MethodInterceptor;
+import org.m1a2st.aop.framework.AdvisorChainFactory;
+import org.m1a2st.aop.framework.DefaultAdvisorChainFactory;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Author m1a2st
@@ -14,6 +21,9 @@ public class AdvisedSupport {
     private TargetSource targetSource;
     private MethodInterceptor methodInterceptor;
     private MethodMatcher methodMatcher;
+    AdvisorChainFactory advisorChainFactory = new DefaultAdvisorChainFactory();
+    private transient Map<Integer, List<Object>> methodCache;
+    private List<Advisor> advisors = new ArrayList<>();
 
     public TargetSource getTargetSource() {
         return targetSource;
@@ -31,6 +41,10 @@ public class AdvisedSupport {
         this.methodInterceptor = methodInterceptor;
     }
 
+    public void addAdvisor(Advisor advisor) {
+        advisors.add(advisor);
+    }
+
     public MethodMatcher getMethodMatcher() {
         return methodMatcher;
     }
@@ -45,5 +59,43 @@ public class AdvisedSupport {
 
     public void setProxyTargetClass(boolean proxyTargetClass) {
         this.proxyTargetClass = proxyTargetClass;
+    }
+
+    public Map<Integer, List<Object>> getMethodCache() {
+        return methodCache;
+    }
+
+    public void setMethodCache(Map<Integer, List<Object>> methodCache) {
+        this.methodCache = methodCache;
+    }
+
+    public AdvisorChainFactory getAdvisorChainFactory() {
+        return advisorChainFactory;
+    }
+
+    public void setAdvisorChainFactory(AdvisorChainFactory advisorChainFactory) {
+        this.advisorChainFactory = advisorChainFactory;
+    }
+
+    public List<Advisor> getAdvisors() {
+        return advisors;
+    }
+
+    public void setAdvisors(List<Advisor> advisors) {
+        this.advisors = advisors;
+    }
+
+    /**
+     * 用来返回方法的攔截器鏈
+     */
+    public List<Object> getInterceptorsAndDynamicInterceptionAdvice(Method method, Class<?> targetClass) {
+        Integer cacheKey = method.hashCode();
+        List<Object> cached = this.methodCache.get(cacheKey);
+        if (cached == null) {
+            cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(
+                    this, method, targetClass);
+            this.methodCache.put(cacheKey, cached);
+        }
+        return cached;
     }
 }
